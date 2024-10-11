@@ -35,15 +35,15 @@ public class AuthController {
         @RequestParam("user")       String jsonUser,
         @RequestParam("hash")       String hash,
         HttpServletRequest request
-    ) throws JsonMappingException, JsonProcessingException  {
+    ) throws JsonProcessingException  {
         var dataCheck = telegramService.buildDataCheckString(request.getParameterMap());
         var user = mapper.readValue(jsonUser, User.class);
 
         if(telegramService.isValid(dataCheck, hash)){
-            log.info("Валидация прошла успешно для пользователя: " + user.toString());
+            log.info("Валидация прошла успешно для пользователя: {}", user.toString());
             userService.save(user);
         } else {
-            log.warn("Валидация провалена для пользователя: " + user.toString());
+            log.warn("Валидация провалена для пользователя: {}", user.toString());
         }
     }
 }
