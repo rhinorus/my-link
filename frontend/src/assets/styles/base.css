@@ -1,0 +1,19 @@
+
+/* Оформление фона */
+:root {
+  --bg-color: #FFFFFF;
+  --secondary-bg-color: #EFEFF4;
+  
+  --card-bg-color: #FFFFFF;
+  --accent-color: #007AFF;
+  --accent-color-hover: #2990FF;
+}
+
+/* Оформление текста */
+:root {
+  --text-font-family: 'San Francisco';
+  --text-hint-color: #707579;
+  --text-color: #000;
+  --secondary-text-color: #FFF;      
+  --destructive-text-color: #E53935;      
+}

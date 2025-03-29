@@ -1,0 +1,71 @@
+@import './base.css';
+@import './layout.css';
+
+@font-face {
+    font-family: 'San Francisco';
+    src: url(../fonts/SFProText-Regular.ttf);
+}
+
+@font-face {
+    font-family: 'San Francisco SemiBold';
+    src: url(../fonts/SFProText-Semibold.ttf);
+}
+
+* {
+    font-family: var(--text-font-family);
+    margin: 0;
+}
+
+html {
+    background-color: var(--secondary-bg-color);
+}
+
+body, #app {
+    min-height: 100vh;
+    width: 100%;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+}
+
+#app {
+    max-width: 600px;
+}
+
+.hint {
+    color: var(--text-hint-color); 
+    font-size: .75rem;
+}
+
+.block {
+    display: flex;
+    padding: 1rem;
+}
+
+.card {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+
+    padding: 1rem;
+    border-radius: .5rem;
+
+    background-color: var(--bg-color);
+}
+
+input[type="text"] {
+    padding-bottom: 2px;
+    border: 0px;
+    border-bottom: 1px solid #bdbdbd;
+    transition: border-color 0.25s ease-in-out;
+
+}
+
+input[type="text"]:focus {
+    padding-bottom: 1px;
+    outline: none;
+    border: 0px;
+    border-bottom: 2px solid var(--accent-color);
+}
