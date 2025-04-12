@@ -12,4 +12,5 @@ spring.application.name: mylink
 telegram.token: ${TELEGRAM_BOT_TOKEN}
 
 # https reverse proxy support
-server.use-forward-headers: true
+server:
+  forward-headers-strategy: framework

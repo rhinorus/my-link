@@ -20,7 +20,7 @@ async function removeUrl() {
     const confirmed = await window.confirm("Вы уверены? Ссылка будет удалена.");
     if (!confirmed) return;
 
-    axios.delete(`/links/${props.shortUrl}`).then(
+    axios.delete(`/api/links/${props.shortUrl}`).then(
         () => {
             emit('update');
             showToast(`Ссылка <b>${props.shortUrl}</b> удалена`);

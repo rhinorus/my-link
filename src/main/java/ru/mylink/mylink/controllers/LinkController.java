@@ -15,7 +15,7 @@ import ru.mylink.mylink.services.LinkService;
 
 @Log4j2
 @RestController
-@RequestMapping(value = "/links")
+@RequestMapping(value = "/api/links")
 public class LinkController {
 
     LinkService linkService;
@@ -32,7 +32,7 @@ public class LinkController {
     @GetMapping(value = "by-short-url/{shortUrl}")
     public ResponseEntity<Link> get(@PathVariable String shortUrl){
         var optionalLink = linkService.find(shortUrl);
-        return ResponseEntity.ofNullable(optionalLink.orElseGet(null));
+        return ResponseEntity.of(optionalLink);
     }
 
     @PutMapping

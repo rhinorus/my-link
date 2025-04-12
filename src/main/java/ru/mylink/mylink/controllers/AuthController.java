@@ -26,7 +26,7 @@ public class AuthController {
     TelegramService telegramService;
     
     @PostMapping("/auth")
-    ResponseEntity<String> auth(
+    public ResponseEntity<String> auth(
         @RequestParam("user")       String jsonUser,
         @RequestParam("hash")       String hash,
         HttpServletRequest request

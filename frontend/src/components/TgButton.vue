@@ -4,7 +4,14 @@ import { computed } from 'vue';
 
 const props = defineProps({
   name: String,
+
   disabled: {
+    default: false,
+    required: false,
+    type: Boolean
+  },
+
+  alert: {
     default: false,
     required: false,
     type: Boolean
@@ -12,10 +19,16 @@ const props = defineProps({
 });
 
 const btnClass = computed(() => {
-  if (props.disabled){
-    return 'disabled';
-  }
-  return '';
+  let classes = [];
+
+  if (props.disabled)
+    classes.push('disabled');
+
+  if (props.alert)
+    classes.push('alert');
+
+
+  return classes;
 });
 
 </script>
@@ -53,8 +66,12 @@ const btnClass = computed(() => {
 }
 
 .button.disabled {
-  background-color: #aaa !important;
+  background-color: #aaa;
   cursor: default;
+}
+
+.button.alert {
+  background-color: rgba(200, 0, 0, .3);
 }
 
 </style>

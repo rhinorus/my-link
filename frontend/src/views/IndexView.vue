@@ -2,7 +2,7 @@
 import TgButton from '@/components/TgButton.vue';
 import ShortLink from '@/components/ShortLink.vue';
 import type { ILink } from '@/components/ShortLink.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import showToast, { ToastType } from '@/mixins/toastMixin';
@@ -10,13 +10,24 @@ import moment from 'moment';
 
 const link = ref({
   url: '',
-  shortUrl: ''
+  shortUrl: '',
+  isAlreadyUsed: false
 });
 
 const links = ref<ILink[]>([])
 
+// Проверка на существующую короткую ссылку
+watch(
+  () => link.value.shortUrl,
+  (shortUrl) => {
+    axios.get(`/api/links/by-short-url/${shortUrl}`).then(
+      () => link.value.isAlreadyUsed = true,
+      () => link.value.isAlreadyUsed = false
+    );
+})
+
 async function refresh() {
-  axios.get('/links').then(
+  axios.get('/api/links').then(
     (response) => {
       links.value = response.data;
       links.value.sort((a,b) => moment(b.lastModified).diff(moment(a.lastModified)));
@@ -35,7 +46,7 @@ function clearForm() {
 
 function createShortUrl() {
   if (isFormComplete.value) {
-    axios.put('/links', link.value).then(
+    axios.put('/api/links', link.value).then(
       () => {
         refresh();
         showToast("Ссылка создана!", ToastType.Success);
@@ -49,10 +60,22 @@ function createShortUrl() {
 const isFormComplete = computed(() => {
   if (link.value.url == '')
     return false;
+
   if (link.value.shortUrl == '')
     return false;
+
+  if (link.value.isAlreadyUsed)
+    return false;
+
   return true;
-});
+})
+
+const creationButtonText = computed(() => {
+  if (link.value.isAlreadyUsed)
+    return 'Короткое название уже занято';
+
+  return 'Создать ссылку';
+})
 
 refresh();
 
@@ -103,7 +126,11 @@ refresh();
 
         </div>
 
-        <tg-button @click="createShortUrl" :disabled="!isFormComplete" class="w-100" :name="'Создать ссылку'"></tg-button>
+        <tg-button @click="createShortUrl" class="w-100" 
+          :alert="link.isAlreadyUsed" 
+          :disabled="!isFormComplete" 
+          :name="creationButtonText">
+        </tg-button>
       </div>
 
     </div>

@@ -15,7 +15,7 @@ public class MainController {
 
     LinkService linkService;
 
-    MainController(LinkService linkService) {
+    public MainController(LinkService linkService) {
         this.linkService = linkService;
     }
 
@@ -25,7 +25,7 @@ public class MainController {
     }
 
     @GetMapping(value = "{shortUrl}")
-    RedirectView get(@PathVariable("shortUrl") String shortUrl) {
+    public RedirectView get(@PathVariable("shortUrl") String shortUrl) {
         var optionalLink = linkService.find(shortUrl);
 
         if (optionalLink.isPresent())
