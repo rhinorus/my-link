@@ -9,5 +9,6 @@ import ru.mylink.mylink.model.entity.Link;
 public interface LinkRepository extends JpaRepository<Link, String>{
     
     public Optional<Link> findFirstByShortUrl(String shortUrl);
+    public Iterable<Link> findAllBySessionToken(String sessionToken);
 
 }

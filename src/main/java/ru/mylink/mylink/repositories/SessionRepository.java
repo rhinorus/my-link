@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ru.mylink.mylink.model.entity.Session;
 
-public interface SessionRepository extends JpaRepository<Session, Long>{
+public interface SessionRepository extends JpaRepository<Session, String> {
     public Optional<Session> findByToken(String token);
 }

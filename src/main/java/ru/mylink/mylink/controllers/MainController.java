@@ -8,16 +8,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import ru.mylink.mylink.services.LinkService;
+import ru.mylink.mylink.model.entity.Link;
 
 @Controller
 public class MainController {
-
-    LinkService linkService;
-
-    public MainController(LinkService linkService) {
-        this.linkService = linkService;
-    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView home() {
@@ -25,12 +19,8 @@ public class MainController {
     }
 
     @GetMapping(value = "{shortUrl}")
-    public RedirectView get(@PathVariable("shortUrl") String shortUrl) {
-        var optionalLink = linkService.find(shortUrl);
-
-        if (optionalLink.isPresent())
-            return new RedirectView(optionalLink.get().getUrl());
-        return new RedirectView("/pages/404");
+    public RedirectView get(@PathVariable("shortUrl") Link link) {
+        return new RedirectView(link.getUrl());
     }
 
 }

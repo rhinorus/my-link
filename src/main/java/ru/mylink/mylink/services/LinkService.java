@@ -1,11 +1,13 @@
 package ru.mylink.mylink.services;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ru.mylink.mylink.model.entity.Link;
+import ru.mylink.mylink.model.entity.Session;
 import ru.mylink.mylink.repositories.LinkRepository;
 
 @Service
@@ -22,13 +24,15 @@ public class LinkService {
         return linkRepository.findAll();
     }
 
+    public Iterable<Link> findAllBySession(Session session){
+        return linkRepository.findAllBySessionToken(session.getToken());
+    }
+
     public Link put(Link link){
-        // TODO: Валидировать пользователя, который предпринял попытку сохранения
         return linkRepository.save(link);
     }
 
-    public Boolean delete(String shortUrl){
-        // TODO: Валидировать пользователя, который предпринял попытку удаления
+    public Boolean deleteIfExists(String shortUrl){
         var link = find(shortUrl);
 
         if (link.isEmpty())
@@ -36,6 +40,21 @@ public class LinkService {
 
         linkRepository.delete(link.get());
         return true;
+    }
+
+    public Boolean isAuthorized(Link link, Session session){
+
+        // Либо ссылка создана в рамках текущей сессии
+        if (Objects.nonNull(link.getSession()))
+            if (link.getSession().getToken().equals(session.getToken()))
+                return true;
+
+        // Либо ссылка принадлежит текущему пользователю
+        if (Objects.nonNull(session.getUser()))
+            if (Objects.nonNull(link.getUser()))
+                return link.getUser().getId().equals(session.getUser().getId());
+
+        return false;
     }
 
 }

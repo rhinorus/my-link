@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -37,13 +39,23 @@ public class Link {
 
     // Ссылка может быть привязана как к пользователю, так и к анонимной сессии
     // Привязка к анонимной сессии осуществляется тогда, когда пользователь не авторизован
+    @JsonIgnore
     @ManyToOne
     private Session session;
 
+    @JsonIgnore
     @ManyToOne
     private User user;
 
     public void setShortUrl(String shortUrl){
         this.shortUrl = shortUrl.toLowerCase();
+    }
+
+    public String getUrl(){
+        var lower = this.url.toLowerCase();
+        if (lower.startsWith("http://") || lower.startsWith("https://"))
+            return lower;
+        
+        return "https://" + lower;
     }
 }

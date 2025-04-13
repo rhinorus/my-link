@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import ru.mylink.mylink.model.entity.Session;
 import ru.mylink.mylink.model.entity.User;
@@ -15,6 +16,7 @@ import ru.mylink.mylink.repositories.SessionRepository;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
+    private final CookieService cookieService;
 
     /** Создает новый объект сессии (detached), гарантируя, что сессии с таким токеном не существует*/
     private Session generateEmptySession(){
@@ -41,4 +43,16 @@ public class SessionService {
         return sessionRepository.save(session);
     }
     
+    /** Возвращает сессию пользователя. Если отсутствует, то анонимную сессию. Если отсутствует, то Optional.empty */
+    public Optional<Session> extractFromRequest(HttpServletRequest request){
+        var userToken = cookieService.getUserToken(request);
+        if (userToken.isPresent())
+            return findByToken(userToken.get());
+
+        var anonymousToken = cookieService.getAnonymousToken(request);
+        if (anonymousToken.isPresent())
+            return findByToken(anonymousToken.get());
+
+        return Optional.empty();
+    }
 }
