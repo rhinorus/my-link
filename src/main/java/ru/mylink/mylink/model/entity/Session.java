@@ -12,20 +12,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "sessions")
 @Getter @Setter
 @NoArgsConstructor
-@Table(name = "users")
-public class User {
+public class Session {
 
     @Id
-    private Long id;
-    private String username;
-    private String firstName;
-    private String lastName;
+    private String token;
 
-    @OneToOne(mappedBy="user")
-    private Session session;
+    @OneToOne
+    private User user;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy="session")
     private Set<Link> links;
 }

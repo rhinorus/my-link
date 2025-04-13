@@ -4,12 +4,11 @@ import java.util.Date;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -33,12 +32,16 @@ public class Link {
     @NotNull
     private String url;
 
-    // Не преобразуем поле при конвертации в JSON, для безопасности
-    @JsonIgnore 
-    private Long userId;
-
     @UpdateTimestamp
     private Date lastModified;
+
+    // Ссылка может быть привязана как к пользователю, так и к анонимной сессии
+    // Привязка к анонимной сессии осуществляется тогда, когда пользователь не авторизован
+    @ManyToOne
+    private Session session;
+
+    @ManyToOne
+    private User user;
 
     public void setShortUrl(String shortUrl){
         this.shortUrl = shortUrl.toLowerCase();
