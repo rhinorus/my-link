@@ -1,4 +1,6 @@
-package ru.mylink.mylink.controllers;
+package ru.mylink.mylink.controllers.api;
+
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,10 @@ public class LinkController {
     @GetMapping
     public Iterable<Link> list(HttpServletRequest request){
         var session = sessionService.extractFromRequest(request);
-        return linkService.findAllBySession(session.get());
+        if (session.isPresent())
+            return linkService.findAllBySession(session.get());
+
+        return new ArrayList<>();
     }
     
     @GetMapping(value = "by-short-url/{shortUrl}")
@@ -42,6 +47,7 @@ public class LinkController {
     public ResponseEntity<Link> put(@RequestBody Link link, HttpServletRequest request) {
         var session = sessionService.extractFromRequest(request);
         link.setSession(session.get());
+        link.setUser(session.get().getUser());
         return ResponseEntity.ok(linkService.put(link));
     }
 

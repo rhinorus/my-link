@@ -25,4 +25,7 @@ public class Session {
 
     @OneToMany(mappedBy="session")
     private Set<Link> links;
+
+    @OneToOne(mappedBy="session")
+    private SessionCentralizedAuthRequest request;
 }

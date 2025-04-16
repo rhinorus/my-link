@@ -18,14 +18,20 @@ import lombok.Setter;
 public class User {
 
     @Id
-    private Long id;
+    private Long telegramId;
     private String username;
-    private String firstName;
-    private String lastName;
 
     @OneToOne(mappedBy="user")
     private Session session;
 
     @OneToMany(mappedBy="user")
     private Set<Link> links;
+
+    @OneToOne(mappedBy="user")
+    private SessionCentralizedAuthRequest request;
+
+    public User(Long telegramId) {
+        setTelegramId(telegramId);
+    }
+
 }

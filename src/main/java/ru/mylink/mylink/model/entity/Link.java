@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Table(
     name = "links",
-    indexes = {@Index(columnList = "userId")}
+    indexes = {@Index(columnList = "user_telegram_id")}
 )
 @Getter @Setter @NoArgsConstructor
 public class Link {

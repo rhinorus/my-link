@@ -10,6 +10,9 @@ spring:
 
 spring.application.name: mylink
 telegram.token: ${TELEGRAM_BOT_TOKEN}
+application.externalUrl: ${EXTERNAL_URL:http://localhost:8080/}
+application.centralizedAuthApplicationUrl: ${CENTRALIZED_AUTH_APP_URL:http://localhost:8090}
+application.centralizedAuthBotUrl: ${CENTRALIZED_AUTH_BOT_URL:https://t.me/central_auth_test_bot}
 
 # https reverse proxy support
 server:

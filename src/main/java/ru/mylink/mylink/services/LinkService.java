@@ -52,7 +52,7 @@ public class LinkService {
         // Либо ссылка принадлежит текущему пользователю
         if (Objects.nonNull(session.getUser()))
             if (Objects.nonNull(link.getUser()))
-                return link.getUser().getId().equals(session.getUser().getId());
+                return link.getUser().getTelegramId().equals(session.getUser().getTelegramId());
 
         return false;
     }

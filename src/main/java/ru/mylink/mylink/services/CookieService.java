@@ -28,8 +28,20 @@ public class CookieService {
         cookie.setMaxAge(60 * 60 * 24 * 30); 
 
         return cookie;
+    } 
+
+    private Cookie buildUserCookie(String token) {
+        var cookie = new Cookie(
+            USER_TOKEN_COOKIE_NAME,
+            token
+        );
+
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24 * 30);
+        
+        return cookie;
     }
-    
+
     public Optional<Cookie> find(HttpServletRequest request, String cookieName){
         var cookies = request.getCookies();
 
@@ -59,9 +71,14 @@ public class CookieService {
         return Optional.empty();
     }
 
-    public void addAnonymousTokenCookie(HttpServletResponse response, String token){
-        var anonymousCookie = buildAnonymousCookie(token);
+    public void addAnonymousTokenCookie(HttpServletResponse response, String sessionToken){
+        var anonymousCookie = buildAnonymousCookie(sessionToken);
         response.addCookie(anonymousCookie);
+    }
+
+    public void addUserTokenCookie(HttpServletResponse response, String sessionToken) {
+        var userCookie = buildUserCookie(sessionToken);
+        response.addCookie(userCookie);
     }
 
 }
