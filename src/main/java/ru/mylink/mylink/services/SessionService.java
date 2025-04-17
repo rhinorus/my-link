@@ -94,6 +94,12 @@ public class SessionService {
         return authRequestRepository.findByUuid(requestUuid); 
     }
 
+    public void deleteRequest(String requestUuid) {
+        var request = findRequest(requestUuid);
+        if (request.isPresent())
+            authRequestRepository.delete(request.get());
+    }
+
     public void setUserForAuthRequest(String requestUuid, Long userTelegramId){
         var optionalRequest = findRequest(requestUuid);
 

@@ -67,9 +67,9 @@ public class CentralizedAuthController {
         // Успешная авторизация. Отдаем пользовательскую сессию
         var userSession = sessionService.createForUser(user);
         cookieService.addUserTokenCookie(response, userSession.getToken());
+        sessionService.deleteRequest(authRequest.getUuid());
 
         // TODO: Привязать ссылки из текущей анонимной сессии пользователю?
-        // TODO: Почистить запрос на авторизацию, как использованный
 
         return ResponseEntity.ok().build();
     }
