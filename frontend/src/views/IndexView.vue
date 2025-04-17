@@ -2,10 +2,12 @@
 import TgButton from '@/components/TgButton.vue';
 import ShortLink from '@/components/ShortLink.vue';
 import type { ILink } from '@/components/ShortLink.vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, shallowRef } from 'vue';
+import { onMounted } from 'vue';
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import showToast, { ToastType } from '@/mixins/toastMixin';
+import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
 
 const link = ref({
@@ -14,7 +16,13 @@ const link = ref({
   isAlreadyUsed: false
 });
 
-const links = ref<ILink[]>([])
+const user = ref({
+  authorized: false,
+  authUrl: ''
+});
+
+const links = ref<ILink[]>([]);
+const showDialog = shallowRef(false);
 
 // Проверка на существующую короткую ссылку
 watch(
@@ -31,6 +39,10 @@ async function refresh() {
     (response) => {
       links.value = response.data;
       links.value.sort((a,b) => moment(b.lastModified).diff(moment(a.lastModified)));
+
+      user.value.authorized = isAuthorized();
+      if (!user.value.authorized)
+        loadAuthUrl();
     }
   )
 }
@@ -54,6 +66,69 @@ function createShortUrl() {
       }
     );
   }
+
+}
+
+function isAuthorized() {
+  const match = document.cookie.match(/USER_TOKEN=([^;]+)/);
+  return match !== null;
+}
+
+function loadAuthUrl() {
+  axios.get('/api/centralized-auth/url').then(
+    (response) => {
+      user.value.authUrl = response.data;
+      checkAuth();
+    }
+  )
+}
+
+function checkAuth() {
+  if (user.value.authorized)
+    return;
+
+  setTimeout(() => {
+    axios.get("/api/centralized-auth/auth").then(
+      () => {
+        user.value.authorized = true;
+        showDialog.value = false;
+        refresh();
+      }
+    );
+    checkAuth();
+  }, 3000);
+}
+
+function openAuthModal() {
+  showDialog.value = true;
+}
+
+function openAuthLink() {
+  window.open(user.value.authUrl, '_blank');
+}
+
+function appendQRCode () {
+  const qrCode = new QRCodeStyling({
+      width: 250,
+      height: 250,
+      margin: 0,
+      type: "svg",
+      data: user.value.authUrl,
+      image: "/src/assets/images/telegram.webp",
+      dotsOptions: {
+          color: "#24A1DE",
+          type: "rounded"
+      },
+      imageOptions: {
+          crossOrigin: "anonymous",
+          margin: 10,
+          imageSize: .4
+      }
+  });
+
+  var qrCodeElement = document.getElementById("qrcode");
+  if (qrCodeElement !== null)
+    qrCode.append(qrCodeElement);
 
 }
 
@@ -85,17 +160,32 @@ refresh();
 
   <div class="block column space-between gap-1">
 
-    <!-- О том, как использовать сервис -->
-    <div class="scenarios card">
+    <!-- Карточка авторизации -->
+    <div class="scenarios card" v-if="!user.authorized && user.authUrl" @click="openAuthModal">
       <!-- Заголовок карточки -->
-      <div class="w-100 row flex-start gap-05">
+      <div class="w-100 row flex-start gap-1">
         <div class="center">
-          <img src="../assets/images/lightbulb.svg" alt="lightbulb">
+          <img src="../assets/images/telegram.webp" style="width: 28px" alt="telegram-icon">
         </div>
 
         <div class="column gap-025">
-          <span>Сценарии использования</span>
-          <span class="hint">Как приложение помогает в повседневности</span>
+          <span>Войдите через телеграм</span>
+          <span class="hint">Все созданные ссылки будут привязаны к аккаунту</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточка авторизации -->
+    <div class="scenarios card" v-if="user.authorized">
+      <!-- Заголовок карточки -->
+      <div class="w-100 row flex-start gap-1">
+        <div class="center">
+          <img src="../assets/images/check.png" style="width: 28px" alt="check-icon">
+        </div>
+
+        <div class="column gap-025">
+          <span>Вы авторизованы!</span>
+          <span class="hint">Все созданные ссылки привязаны к Вашему аккаунту</span>
         </div>
       </div>
     </div>
@@ -159,7 +249,24 @@ refresh();
 
   </div>
 
+  <!-- Модальное окно авторизации -->
+  <v-dialog v-model="showDialog" width="auto" @vue:updated="appendQRCode">
+    <v-card
+        title="Отсканируйте QR-код"
+        style="padding: 20px;"
+      >
+      <div class="flex column center gap-1" style="margin-bottom: 20px;">
+        <div id="qrcode"></div>
 
+        <span>ИЛИ</span>
+
+        <tg-button @click="openAuthLink" style="height: 30px; margin: 10px"
+          :name="'Войдите с текущего устройства'">
+        </tg-button>
+      </div>
+        
+      </v-card>
+  </v-dialog>
 
 </template>
 

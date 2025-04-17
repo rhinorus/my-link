@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import ru.mylink.mylink.model.dto.CentralizedAuthUser;
 import ru.mylink.mylink.services.CookieService;
+import ru.mylink.mylink.services.LinkService;
 import ru.mylink.mylink.services.SessionService;
 import ru.mylink.mylink.services.TelegramAuthService;
 
@@ -30,6 +31,7 @@ public class CentralizedAuthController {
     private final SessionService sessionService;
     private final TelegramAuthService telegramAuthService;
     private final CookieService cookieService;
+    private final LinkService linkService;
 
     @PostMapping
     public ResponseEntity<String> confirmAuth(@RequestBody CentralizedAuthUser userInfo) {
@@ -69,7 +71,8 @@ public class CentralizedAuthController {
         cookieService.addUserTokenCookie(response, userSession.getToken());
         sessionService.deleteRequest(authRequest.getUuid());
 
-        // TODO: Привязать ссылки из текущей анонимной сессии пользователю?
+        // Переносим все текущие ссылки из анонимной сессии к пользователю
+        linkService.transferLinksToUser(session.getToken(), user.getTelegramId());
 
         return ResponseEntity.ok().build();
     }

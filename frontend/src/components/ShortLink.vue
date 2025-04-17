@@ -51,7 +51,8 @@ const formattedDate = computed(() => {
         <!-- Дата и число переходов -->
         <div class="space-between">
             <span class="hint">Дата: <b>{{ formattedDate }}</b></span>
-            <span class="hint">Переходов: <b>{{ numberOfClicks }}</b></span>
+            <span></span>
+            <!-- <span class="hint">Переходов: <b>{{ numberOfClicks }}</b></span> -->
         </div>
 
         <!-- Строка с адресом -->

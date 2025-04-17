@@ -3,18 +3,19 @@ package ru.mylink.mylink.services;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import ru.mylink.mylink.model.entity.Link;
 import ru.mylink.mylink.model.entity.Session;
 import ru.mylink.mylink.repositories.LinkRepository;
 
 @Service
+@RequiredArgsConstructor
 public class LinkService {
 
-    @Autowired
-    LinkRepository linkRepository;
+    private final LinkRepository linkRepository; 
+    private final UserService userService;
     
     public Optional<Link> find(String shortUrl) {
         return linkRepository.findFirstByShortUrl(shortUrl.toLowerCase());
@@ -26,6 +27,10 @@ public class LinkService {
 
     public Iterable<Link> findAllBySession(Session session){
         return linkRepository.findAllBySessionToken(session.getToken());
+    }
+
+    public Iterable<Link> findAllByUserTelegramId(Long userTelegramId){
+        return linkRepository.findAllByUserTelegramId(userTelegramId);
     }
 
     public Link put(Link link){
@@ -55,6 +60,14 @@ public class LinkService {
                 return link.getUser().getTelegramId().equals(session.getUser().getTelegramId());
 
         return false;
+    }
+
+    public void transferLinksToUser(String anonymousSessionToken, Long userTelegramId) {
+        var user = userService.getOrCreate(userTelegramId);
+        var links = linkRepository.findAllBySessionToken(anonymousSessionToken);
+
+        links.forEach(link -> link.setUser(user));
+        linkRepository.saveAll(links);
     }
 
 }

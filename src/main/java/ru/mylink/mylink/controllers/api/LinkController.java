@@ -1,6 +1,7 @@
 package ru.mylink.mylink.controllers.api;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,10 +32,19 @@ public class LinkController {
     @GetMapping
     public Iterable<Link> list(HttpServletRequest request){
         var session = sessionService.extractFromRequest(request);
-        if (session.isPresent())
-            return linkService.findAllBySession(session.get());
+        var links = new HashSet<Link>();
 
-        return new ArrayList<>();
+        if (Objects.nonNull(session.get().getUser())) {
+            var userLinks = linkService.findAllByUserTelegramId(
+                session.get().getUser().getTelegramId()
+            );
+            userLinks.forEach(link -> links.add(link));
+        }
+
+        var anonymousLinks = linkService.findAllBySession(session.get());
+        anonymousLinks.forEach(link -> links.add(link));
+
+        return links;
     }
     
     @GetMapping(value = "by-short-url/{shortUrl}")
@@ -46,8 +56,11 @@ public class LinkController {
     @PutMapping
     public ResponseEntity<Link> put(@RequestBody Link link, HttpServletRequest request) {
         var session = sessionService.extractFromRequest(request);
-        link.setSession(session.get());
         link.setUser(session.get().getUser());
+
+        if (Objects.isNull(session.get().getUser()))
+            link.setSession(session.get());
+
         return ResponseEntity.ok(linkService.put(link));
     }
 
