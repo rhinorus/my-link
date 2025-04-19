@@ -41,6 +41,10 @@ const formattedDate = computed(() => {
     return moment(props.lastModified).format('DD.MM.YYYY в HH:mm')
 })
 
+const formattedTargetUrl = computed(() => {
+    return props.url.replace('https://', '').replace('http://', '');
+})
+
 </script>
 
 <template>
@@ -50,7 +54,7 @@ const formattedDate = computed(() => {
 
         <!-- Дата и число переходов -->
         <div class="space-between">
-            <span class="hint">Дата: <b>{{ formattedDate }}</b></span>
+            <span class="hint"><b>{{ formattedDate }}</b></span>
             <span></span>
             <!-- <span class="hint">Переходов: <b>{{ numberOfClicks }}</b></span> -->
         </div>
@@ -65,6 +69,9 @@ const formattedDate = computed(() => {
             <!-- Пустой элемент для корректной работы ховера -->
             <div></div>
         </div>
+
+        <!-- Строка с целевым адресом -->
+        <span class="hint target-url">{{ formattedTargetUrl }}</span>
 
         <hr>
 
@@ -106,6 +113,13 @@ const formattedDate = computed(() => {
 
 .uri span {
     color: var(--text-color);
+}
+
+.target-url {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 80%;
+    white-space: nowrap;
 }
 
 .uri:hover span {
