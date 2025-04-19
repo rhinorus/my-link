@@ -2,7 +2,8 @@ spring:
   datasource:
     url:  jdbc:postgresql://${PG_HOST:localhost}:${PG_PORT:5432}/${PG_DB:mylink}
     username: ${PG_USER:postgres}
-    password: ${PG_PASSWORD:fID3P8zg}
+    password: ${PG_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
   jpa:
     generate-ddl: true
     open-in-view: false

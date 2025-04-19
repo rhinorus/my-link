@@ -44,10 +44,10 @@ public class SessionService {
     }
 
     public Session createForUser(User user) {
-        // Сессия может быть только одна. Удаляем текущую, если есть
+        // Сессия может быть только одна. Возвращаем текущую, если есть
         var currentSession = user.getSession();
         if (Objects.nonNull(currentSession))
-            sessionRepository.delete(currentSession);
+            return currentSession;
 
         var session = generateEmptySession();
         session.setUser(user);
