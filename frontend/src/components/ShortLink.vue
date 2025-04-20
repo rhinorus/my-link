@@ -9,12 +9,13 @@ export interface ILink {
     url: String,
     shortUrl: String,
     numberOfClicks: Number,
+    isFavorite: boolean,
     lastModified: Date
 }
 
 const props = defineProps<ILink>();
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update', 'toggleIsFavorite']);
 
 async function removeUrl() {
     const confirmed = await window.confirm("Вы уверены? Ссылка будет удалена.");
@@ -80,6 +81,9 @@ const formattedTargetUrl = computed(() => {
             <img class="icon-btn" src="../assets/images/delete.svg" @click="removeUrl" alt="delete-icon">
 
             <div class="flex-end gap-1">
+                <img v-if="isFavorite" class="icon-btn" src="../assets/images/heart-fill.svg" @click="$emit('toggleIsFavorite', shortUrl)" alt="favorite-icon">
+                <img v-else class="icon-btn" src="../assets/images/heart.svg" @click="$emit('toggleIsFavorite', shortUrl)" alt="empty-favorite-icon">
+                
                 <img class="icon-btn" src="../assets/images/copy.svg" @click="copy" alt="copy-icon">
             </div>
 

@@ -2,7 +2,7 @@ package ru.mylink.mylink.model.entity;
 
 import java.util.Date;
 
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,7 +34,9 @@ public class Link {
     @NotNull
     private String url;
 
-    @UpdateTimestamp
+    private Boolean isFavorite = false;
+
+    @CreationTimestamp
     private Date lastModified;
 
     // Ссылка может быть привязана как к пользователю, так и к анонимной сессии

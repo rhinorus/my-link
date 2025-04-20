@@ -9,6 +9,8 @@
 
 # сборка бэкенда
 # mvn clean package -DskipTests
+# docker build -t rhinorus/mylink:latest .
+# docker push rhinorus/mylink:latest
 
 FROM eclipse-temurin:17-jre-jammy
 

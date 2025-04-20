@@ -3,9 +3,7 @@ import TgButton from '@/components/TgButton.vue';
 import ShortLink from '@/components/ShortLink.vue';
 import type { ILink } from '@/components/ShortLink.vue';
 import { computed, ref, watch, shallowRef } from 'vue';
-import { onMounted } from 'vue';
 import axios from 'axios';
-import { toast } from 'vue3-toastify';
 import showToast, { ToastType } from '@/mixins/toastMixin';
 import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
@@ -20,6 +18,9 @@ const user = ref({
   authorized: false,
   authUrl: ''
 });
+
+// Переменная для показа "Все ссылки / Только избранное"
+const showFavoritesOnly = ref(false);
 
 const links = ref<ILink[]>([]);
 const showDialog = shallowRef(false);
@@ -49,6 +50,19 @@ async function refresh() {
 
 async function pasteUrl() {
   link.value.url = await navigator.clipboard.readText();
+}
+
+function toggleIsFavorite(shortUrl : string){
+  axios.get(`/api/links/by-short-url/${shortUrl}`).then(
+    (response) => {
+      var modifiableLink = response.data;
+      modifiableLink.isFavorite = !modifiableLink.isFavorite;
+
+      axios.put('/api/links', modifiableLink).then(
+        () => refresh()
+      )
+    }
+  )
 }
 
 function clearForm() {
@@ -132,6 +146,14 @@ function appendQRCode () {
 
 }
 
+function showFavorites() {
+  showFavoritesOnly.value = true;
+}
+
+function showAllLinks() {
+  showFavoritesOnly.value = false;
+}
+
 const isFormComplete = computed(() => {
   if (link.value.url == '')
     return false;
@@ -150,6 +172,12 @@ const creationButtonText = computed(() => {
     return 'Короткое название уже занято';
 
   return 'Создать ссылку';
+})
+
+const filteredLinks = computed(() => {
+  if (showFavoritesOnly.value)
+    return links.value.filter(link => link.isFavorite);
+  return links.value;
 })
 
 refresh();
@@ -225,27 +253,36 @@ refresh();
 
     </div>
 
+    <!-- Блок со ссылками -->
+    <div class="flex column gap-1" style="flex-direction: column;" >
 
-    <!-- Карточка со ссылками -->
-    <div class="flex column gap-1" style="flex-direction: column;" v-if="links.length > 0">
-      <!-- Заголовок карточки -->
-      <div class="w-100 flex-start">
-        <span class="hint">Мои ссылки</span>
+      <!-- Заголовки -->
+      <div class="w-100 flex-start gap-1">
+        <span class="hint choosable-header" :class="showFavoritesOnly ? '' : 'selected'" @click="showAllLinks">Мои ссылки</span>
+        <span class="hint choosable-header" :class="showFavoritesOnly ? 'selected' : ''" @click="showFavorites">Избранное</span>
       </div>
 
-      <div class="flex column gap-1">
+      <div class="flex column gap-1" v-if="filteredLinks.length > 0">
 
         <!-- Ссылка -->
-        <short-link v-for="link in links" :url="link.url" :short-url="link.shortUrl" :number-of-clicks="100"
-          :last-modified="link.lastModified" @update="refresh">
+        <short-link v-for="link in filteredLinks" 
+          :url="link.url" 
+          :is-favorite="link.isFavorite"
+          :short-url="link.shortUrl" 
+          :number-of-clicks="100"
+          :last-modified="link.lastModified" 
+          @update="refresh"
+          @toggle-is-favorite="toggleIsFavorite">
         </short-link>
 
       </div>
+
+        <div v-else class="center">
+          <h4 class="hint">Нет ни одной ссылки</h4>
+        </div>
     </div>
 
-    <div v-else class="center">
-      <h4 class="hint">Вы пока не создали ни одной ссылки</h4>
-    </div>
+   
 
   </div>
 
@@ -302,4 +339,18 @@ h4 {
   justify-content: flex-start;
   gap: .25rem;
 }
+
+.choosable-header {
+  cursor: pointer;
+}
+
+.choosable-header:hover {
+  font-weight: bold;
+}
+
+.choosable-header.selected {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
 </style>
