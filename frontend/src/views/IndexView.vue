@@ -269,7 +269,7 @@ refresh();
           :url="link.url" 
           :is-favorite="link.isFavorite"
           :short-url="link.shortUrl" 
-          :number-of-clicks="100"
+          :count="link.count"
           :last-modified="link.lastModified" 
           @update="refresh"
           @toggle-is-favorite="toggleIsFavorite">

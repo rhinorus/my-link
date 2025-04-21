@@ -1,6 +1,7 @@
 package ru.mylink.mylink.model.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -14,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -22,7 +22,7 @@ import lombok.Setter;
     name = "links",
     indexes = {@Index(columnList = "user_telegram_id")}
 )
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter
 public class Link {
 
     @Id
@@ -35,6 +35,8 @@ public class Link {
     private String url;
 
     private Boolean isFavorite = false;
+
+    private Long count = 0L;
 
     @CreationTimestamp
     private Date lastModified;
@@ -51,6 +53,16 @@ public class Link {
 
     public void setShortUrl(String shortUrl){
         this.shortUrl = shortUrl.toLowerCase();
+    }
+
+    public void incrementCount(){
+        if (Objects.isNull(count))
+            count = 0L;
+        count++;
+    }
+
+    public Long getCount(){
+        return Objects.requireNonNullElse(count, 0L);
     }
 
     public String getUrl(){

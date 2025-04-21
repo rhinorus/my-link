@@ -8,8 +8,8 @@ import { computed } from 'vue';
 export interface ILink {
     url: String,
     shortUrl: String,
-    numberOfClicks: Number,
     isFavorite: boolean,
+    count: Number,
     lastModified: Date
 }
 
@@ -57,7 +57,7 @@ const formattedTargetUrl = computed(() => {
         <div class="space-between">
             <span class="hint"><b>{{ formattedDate }}</b></span>
             <span></span>
-            <!-- <span class="hint">Переходов: <b>{{ numberOfClicks }}</b></span> -->
+            <span class="hint">Переходов: <b>{{ count }}</b></span>
         </div>
 
         <!-- Строка с адресом -->
