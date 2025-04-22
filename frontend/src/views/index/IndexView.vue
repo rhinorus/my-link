@@ -220,7 +220,7 @@ refresh();
         <!-- Заголовок карточки -->
         <div class="w-100 row flex-start gap-1">
           <div class="center">
-            <img src="../assets/images/check.png" style="width: 28px" alt="check-icon">
+            <img src="@/assets/images/check.png" style="width: 28px" alt="check-icon">
           </div>
 
           <div class="column gap-025">
