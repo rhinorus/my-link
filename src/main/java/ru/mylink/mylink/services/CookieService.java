@@ -71,6 +71,10 @@ public class CookieService {
         return Optional.empty();
     }
 
+    public Optional<Cookie> getUserTokenCookie(HttpServletRequest request) {
+        return find(request, USER_TOKEN_COOKIE_NAME);
+    }
+
     public void addAnonymousTokenCookie(HttpServletResponse response, String sessionToken){
         var anonymousCookie = buildAnonymousCookie(sessionToken);
         response.addCookie(anonymousCookie);
