@@ -9,6 +9,8 @@ import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
 import type { IStatistics } from './interfaces/Statistics';
 
+const MAX_NUMBER_OF_LINKS = 99;
+
 const link = ref({
   url: '',
   shortUrl: '',
@@ -165,13 +167,20 @@ function showAllLinks() {
 }
 
 const isFormComplete = computed(() => {
-  if (link.value.url == '')
+  if (link.value.url == '' || link.value.url == null)
     return false;
 
-  if (link.value.shortUrl == '')
+  if (link.value.shortUrl == '' || link.value.shortUrl == null)
     return false;
 
+  return isFormValid.value;
+})
+
+const isFormValid = computed(() => {
   if (link.value.isAlreadyUsed)
+    return false;
+
+  if (links.value.length >= MAX_NUMBER_OF_LINKS)
     return false;
 
   return true;
@@ -180,6 +189,9 @@ const isFormComplete = computed(() => {
 const creationButtonText = computed(() => {
   if (link.value.isAlreadyUsed)
     return 'Короткое название уже занято';
+
+  if (links.value.length >= MAX_NUMBER_OF_LINKS)
+    return `Нельзя создать больше ${MAX_NUMBER_OF_LINKS} ссылок`;
 
   return 'Создать ссылку';
 })
@@ -257,7 +269,7 @@ refresh();
           </div>
 
           <tg-button @click="createShortUrl" class="w-100" 
-            :alert="link.isAlreadyUsed" 
+            :alert="!isFormValid" 
             :disabled="!isFormComplete" 
             :name="creationButtonText">
           </tg-button>

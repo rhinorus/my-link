@@ -2,6 +2,7 @@ package ru.mylink.mylink.services;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -25,11 +26,11 @@ public class LinkService {
         return linkRepository.findAll();
     }
 
-    public Iterable<Link> findAllBySession(Session session){
+    public Set<Link> findAllBySession(Session session){
         return linkRepository.findAllBySessionToken(session.getToken());
     }
 
-    public Iterable<Link> findAllByUserTelegramId(Long userTelegramId){
+    public Set<Link> findAllByUserTelegramId(Long userTelegramId){
         return linkRepository.findAllByUserTelegramId(userTelegramId);
     }
 

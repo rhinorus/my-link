@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +24,8 @@ import ru.mylink.mylink.services.SessionService;
 @RestController
 @RequestMapping(value = "/api/links")
 public class LinkController {
+
+    private final Integer MAX_NUMBER_OF_LINKS = 99;
 
     private final LinkService linkService;
     private final SessionService sessionService;
@@ -58,8 +59,32 @@ public class LinkController {
         var session = sessionService.extractFromRequest(request);
         link.setUser(session.get().getUser());
 
-        if (Objects.isNull(session.get().getUser()))
+        // Ссылка должна либо не существовать
+        // Либо принадлежать текущему пользователю
+        var optionalLink = linkService.find(link.getShortUrl());
+        if (optionalLink.isPresent()){
+            if (!linkService.isAuthorized(link, session.get()))
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } else {
+            // Если ссылка не существует, то число созданных ссылок пользователя должно быть меньше 100
+            if (Objects.nonNull(session.get().getUser())){
+                var user = session.get().getUser();
+                var userLinks = linkService.findAllByUserTelegramId(user.getTelegramId());
+
+                if (userLinks.size() >= MAX_NUMBER_OF_LINKS) 
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
+        // Если текущая сессия анонимная, то привязываем ссылку к ней, если не достигнут лимит
+        if (Objects.isNull(session.get().getUser())){
+            var sessionLinks = linkService.findAllBySession(session.get());
+
+            if (sessionLinks.size() >= MAX_NUMBER_OF_LINKS)
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); 
+
             link.setSession(session.get());
+        }
 
         return ResponseEntity.ok(linkService.put(link));
     }
@@ -79,7 +104,7 @@ public class LinkController {
             }
         }
             
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
 }
