@@ -26,4 +26,7 @@ public class UserService {
         return userRepository.save(new User(telegramId));
     }
 
+    public Long count(){
+        return userRepository.count();
+    }
 }

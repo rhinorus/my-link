@@ -38,7 +38,6 @@ function copy() {
 }
 
 const formattedDate = computed(() => {
-    console.log(props.lastModified);
     return moment(props.lastModified).format('DD.MM.YYYY в HH:mm')
 })
 

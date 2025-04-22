@@ -70,4 +70,12 @@ public class LinkService {
         linkRepository.saveAll(links);
     }
 
+    public Long count() {
+        return linkRepository.count();
+    }
+
+    public Long totalClicks(){
+        return linkRepository.totalClicks();
+    }
+
 }

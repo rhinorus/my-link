@@ -51,20 +51,20 @@ public class CentralizedAuthController {
 
         // Может не быть либо такой сессии ...
         if (optionalSession.isEmpty())
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
 
         var session = optionalSession.get();
         var authRequest = session.getRequest();
         
         // ... либо отсутствовать запрос на авторизацию ...
         if (Objects.isNull(authRequest))
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
 
         var user = authRequest.getUser();
 
         // ... либо по запросу не получен пользователь
         if (Objects.isNull(user))
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
 
         // Успешная авторизация. Отдаем пользовательскую сессию
         var userSession = sessionService.createForUser(user);
