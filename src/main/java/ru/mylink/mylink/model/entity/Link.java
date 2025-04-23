@@ -66,10 +66,10 @@ public class Link {
     }
 
     public String getUrl(){
-        var lower = this.url.toLowerCase();
+        var lower = url.toLowerCase();
         if (lower.startsWith("http://") || lower.startsWith("https://"))
-            return lower;
+            return url;
         
-        return "https://" + lower;
+        return "https://" + url;
     }
 }
