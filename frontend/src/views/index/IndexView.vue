@@ -14,7 +14,8 @@ const MAX_NUMBER_OF_LINKS = 99;
 const link = ref({
   url: '',
   shortUrl: '',
-  isAlreadyUsed: false
+  isAlreadyUsed: false,
+  isBelongsToUser: false
 });
 
 const user = ref({
@@ -35,6 +36,12 @@ const showStatsDialog = shallowRef(false);
 watch(
   () => link.value.shortUrl,
   (shortUrl) => {
+    if(links.value.filter(l => l.shortUrl == shortUrl.toLowerCase()).length > 0){
+      link.value.isBelongsToUser = true;
+      link.value.isAlreadyUsed = false;
+      return;
+    }
+
     axios.get(`/api/links/by-short-url/${shortUrl}`).then(
       () => link.value.isAlreadyUsed = true,
       () => link.value.isAlreadyUsed = false
@@ -192,6 +199,9 @@ const creationButtonText = computed(() => {
 
   if (links.value.length >= MAX_NUMBER_OF_LINKS)
     return `Нельзя создать больше ${MAX_NUMBER_OF_LINKS} ссылок`;
+
+  if (link.value.isBelongsToUser)
+    return 'Обновить значение ссылки';
 
   return 'Создать ссылку';
 })

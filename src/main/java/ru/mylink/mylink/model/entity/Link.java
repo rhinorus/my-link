@@ -39,7 +39,7 @@ public class Link {
     private Long count = 0L;
 
     @CreationTimestamp
-    private Date lastModified;
+    private Date lastModified = new Date();
 
     // Ссылка может быть привязана как к пользователю, так и к анонимной сессии
     // Привязка к анонимной сессии осуществляется тогда, когда пользователь не авторизован
