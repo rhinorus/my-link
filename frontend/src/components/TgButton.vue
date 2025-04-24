@@ -57,7 +57,8 @@ const btnClass = computed(() => {
 }
 
 .btn-name {
-  font-family: 'San Francisco SemiBold';
+  font-family: 'San Francisco';
+  font-weight: bold;
 }
 
 

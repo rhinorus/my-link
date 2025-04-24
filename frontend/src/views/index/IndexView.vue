@@ -41,6 +41,8 @@ watch(
       link.value.isAlreadyUsed = false;
       return;
     }
+    
+    link.value.isBelongsToUser = false;
 
     axios.get(`/api/links/by-short-url/${shortUrl}`).then(
       () => link.value.isAlreadyUsed = true,

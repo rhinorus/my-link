@@ -6,11 +6,6 @@
     src: url(../fonts/SFProText-Regular.ttf);
 }
 
-@font-face {
-    font-family: 'San Francisco SemiBold';
-    src: url(../fonts/SFProText-Semibold.ttf);
-}
-
 * {
     font-family: var(--text-font-family);
     margin: 0;
