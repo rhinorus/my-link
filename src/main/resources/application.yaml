@@ -8,6 +8,11 @@ spring:
     generate-ddl: true
     open-in-view: false
     defer-datasource-initialization: false
+    
+  web:
+    resources:
+      cache:
+        period: 7d
 
 spring.application.name: mylink
 telegram.token: ${TELEGRAM_BOT_TOKEN}
@@ -18,3 +23,5 @@ application.centralizedAuthBotUrl: ${CENTRALIZED_AUTH_BOT_URL:https://t.me/oauth
 # https reverse proxy support
 server:
   forward-headers-strategy: framework
+  compression:
+    enabled: true
