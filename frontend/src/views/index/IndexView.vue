@@ -8,6 +8,7 @@ import showToast, { ToastType } from '@/mixins/toastMixin';
 import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
 import type { IStatistics } from './interfaces/Statistics';
+import Cookies from 'js-cookie'
 
 const MAX_NUMBER_OF_LINKS = 99;
 
@@ -175,6 +176,14 @@ function showAllLinks() {
   showFavoritesOnly.value = false;
 }
 
+async function logout() {
+  const confirmed = await window.confirm("Вы уверены, что хотите выйти из профиля?");
+    if (!confirmed) return;
+
+  Cookies.remove('USER_TOKEN', { path: '/' });
+  refresh();
+}
+
 const isFormComplete = computed(() => {
   if (link.value.url == '' || link.value.url == null)
     return false;
@@ -247,9 +256,11 @@ refresh();
             <img src="@/assets/images/check.png" style="width: 28px" alt="check-icon">
           </div>
 
-          <div class="column gap-025">
-            <span>Вы авторизованы!</span>
-            <span class="hint">Все созданные ссылки привязаны к Вашему аккаунту</span>
+          <div class="column gap-025 w-100">
+            <div class="w-100 center row space-between">
+              <span>Вы авторизованы!</span>
+              <img src="@/assets/images/logout.svg" @click="logout" style="width: 28px" alt="logout-icon">
+            </div>
           </div>
         </div>
       </div>
