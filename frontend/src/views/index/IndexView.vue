@@ -32,6 +32,9 @@ const showFavoritesOnly = ref(false);
 const links = ref<ILink[]>([]);
 const showAuthDialog = shallowRef(false);
 const showStatsDialog = shallowRef(false);
+const showUserAgreementDialog = shallowRef(false);
+
+const userAgreement = shallowRef(String);
 
 // Проверка на существующую короткую ссылку
 watch(
@@ -176,6 +179,12 @@ function showAllLinks() {
   showFavoritesOnly.value = false;
 }
 
+function loadData() {
+  axios.get('/src/assets/templates/user-agreement.html').then(
+    (response) => userAgreement.value = response.data
+  );
+}
+
 async function logout() {
   const confirmed = await window.confirm("Вы уверены, что хотите выйти из профиля?");
     if (!confirmed) return;
@@ -224,6 +233,7 @@ const filteredLinks = computed(() => {
 })
 
 refresh();
+loadData();
 
 </script>
 
@@ -332,7 +342,8 @@ refresh();
     </div>
 
     <!-- Футер -->
-    <div class="footer">
+    <div class="footer gap-1">
+      <span @click="showUserAgreementDialog = true" class="hint">Условия использования</span>
       <span @click="showStatsDialog = true" class="hint">Статистика</span>
     </div>
   </div>
@@ -380,6 +391,17 @@ refresh();
             <span>{{ applicationStats?.totalNumberOfUsers }}</span>
           </div>
 
+        </div>
+      </v-card>
+  </v-dialog>
+
+    <!-- Модальное окно с пользовательским соглашением -->
+    <v-dialog v-model="showUserAgreementDialog" width="auto">
+    <v-card
+        title="Пользовательское соглашение"
+        style="padding: 50px; max-width: 800px;"
+      >
+        <div class="flex column gap-1" v-html="userAgreement">
         </div>
       </v-card>
   </v-dialog>
