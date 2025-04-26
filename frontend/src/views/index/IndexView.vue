@@ -37,9 +37,17 @@ const showUserAgreementDialog = shallowRef(false);
 const userAgreement = shallowRef(String);
 
 // Проверка на существующую короткую ссылку
+// и недопустимые символы
 watch(
   () => link.value.shortUrl,
   (shortUrl) => {
+    let cleaned = shortUrl.replace(/[^a-zA-Zа-яА-ЯёЁ0-9-]/gu, '');
+
+    if (cleaned !== shortUrl){
+      link.value.shortUrl = cleaned;
+      return;
+    }
+
     if(links.value.filter(l => l.shortUrl == shortUrl.toLowerCase()).length > 0){
       link.value.isBelongsToUser = true;
       link.value.isAlreadyUsed = false;

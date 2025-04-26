@@ -2,6 +2,7 @@ package ru.mylink.mylink.controllers.api;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +59,13 @@ public class LinkController {
     public ResponseEntity<Link> put(@RequestBody Link link, HttpServletRequest request) {
         var session = sessionService.extractFromRequest(request);
         link.setUser(session.get().getUser());
+
+        // Очистка последовательности короткой ссылки от недопустимых символов
+        Pattern pattern = Pattern.compile("[^a-zA-Zа-яА-ЯёЁ0-9-]");
+        link.setShortUrl(
+            pattern.matcher(link.getShortUrl())
+                .replaceAll("")
+        );
 
         // Ссылка должна либо не существовать
         // Либо принадлежать текущему пользователю
