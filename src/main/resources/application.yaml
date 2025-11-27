@@ -15,7 +15,6 @@ spring:
         period: 7d
 
 spring.application.name: mylink
-telegram.token: ${TELEGRAM_BOT_TOKEN}
 application.externalUrl: ${EXTERNAL_URL:http://localhost:8080/}
 application.centralizedAuthApplicationUrl: ${CENTRALIZED_AUTH_APP_URL:http://localhost:8090}
 application.centralizedAuthBotUrl: ${CENTRALIZED_AUTH_BOT_URL:https://t.me/oauth0_bot}
@@ -25,3 +24,7 @@ server:
   forward-headers-strategy: framework
   compression:
     enabled: true
+
+oauth0:
+  service-base-url: http://95.86.242.119:8080
+  oauth-base-url: https://oauth0.site

@@ -51,5 +51,10 @@ export default defineConfig({
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
     }
+  },
+  define: {
+    __OAUTH_LIB_CONFIG__: JSON.stringify({
+      baseUrl: 'http://localhost:5173/'
+    })
   }
 })
