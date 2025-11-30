@@ -5,11 +5,10 @@ import type { ILink } from '@/components/ShortLink.vue';
 import { computed, ref, watch, shallowRef } from 'vue';
 import axios from 'axios';
 import showToast, { ToastType } from '@/mixins/toastMixin';
-import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
 import type { IStatistics } from './interfaces/Statistics';
 import Cookies from 'js-cookie'
-import {setConfig, showQrLogin} from "oauth0-js-lib";
+import {showQrLogin} from "oauth0-js-lib";
 
 const MAX_NUMBER_OF_LINKS = 99;
 

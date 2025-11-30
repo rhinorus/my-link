@@ -19,6 +19,7 @@ public class User {
 
     @Id
     private Long telegramId;
+
     private String username;
 
     @OneToOne(mappedBy="user")
