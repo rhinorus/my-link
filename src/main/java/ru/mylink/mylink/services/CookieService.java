@@ -15,20 +15,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CookieService {
 
-    private final String ANONYMOUS_TOKEN_COOKIE_NAME    = "ANONYMOUS_TOKEN";
-    private final String USER_TOKEN_COOKIE_NAME         = "USER_TOKEN";
+    private final String ANONYMOUS_TOKEN_COOKIE_NAME = "ANONYMOUS_TOKEN";
+    private final String USER_TOKEN_COOKIE_NAME = "OAUTH_SESSION_ID";
 
-    private Cookie buildAnonymousCookie(String token){
+    private Cookie buildAnonymousCookie(String token) {
         var cookie = new Cookie(
             ANONYMOUS_TOKEN_COOKIE_NAME,
             token
         );
-        
+
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24 * 30); 
+        cookie.setMaxAge(60 * 60 * 24 * 30);
 
         return cookie;
-    } 
+    }
 
     private Cookie buildUserCookie(String token) {
         var cookie = new Cookie(
@@ -38,11 +38,11 @@ public class CookieService {
 
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60 * 24 * 30);
-        
+
         return cookie;
     }
 
-    public Optional<Cookie> find(HttpServletRequest request, String cookieName){
+    public Optional<Cookie> find(HttpServletRequest request, String cookieName) {
         var cookies = request.getCookies();
 
         if (Objects.isNull(cookies))
@@ -53,7 +53,7 @@ public class CookieService {
             .findFirst();
     }
 
-    public Optional<String> getAnonymousToken(HttpServletRequest request){
+    public Optional<String> getAnonymousToken(HttpServletRequest request) {
         var cookie = find(request, ANONYMOUS_TOKEN_COOKIE_NAME);
 
         if (cookie.isPresent())
@@ -62,12 +62,12 @@ public class CookieService {
         return Optional.empty();
     }
 
-    public Optional<String> getUserToken(HttpServletRequest request){
+    public Optional<String> getUserToken(HttpServletRequest request) {
         var cookie = find(request, USER_TOKEN_COOKIE_NAME);
 
         if (cookie.isPresent())
             return Optional.of(cookie.get().getValue());
-        
+
         return Optional.empty();
     }
 
@@ -75,7 +75,7 @@ public class CookieService {
         return find(request, USER_TOKEN_COOKIE_NAME);
     }
 
-    public void addAnonymousTokenCookie(HttpServletResponse response, String sessionToken){
+    public void addAnonymousTokenCookie(HttpServletResponse response, String sessionToken) {
         var anonymousCookie = buildAnonymousCookie(sessionToken);
         response.addCookie(anonymousCookie);
     }

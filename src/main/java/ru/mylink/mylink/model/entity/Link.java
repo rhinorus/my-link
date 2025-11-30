@@ -45,7 +45,7 @@ public class Link {
     // Привязка к анонимной сессии осуществляется тогда, когда пользователь не авторизован
     @JsonIgnore
     @ManyToOne
-    private Session session;
+    private AnonymousSession anonymousSession;
 
     @JsonIgnore
     @ManyToOne

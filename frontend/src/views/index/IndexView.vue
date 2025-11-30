@@ -116,7 +116,9 @@ function isAuthorized() {
 }
 
 function openAuthModal() {
-    showQrLogin();
+    showQrLogin().then(() => {
+        user.value.authorized = true;
+    })
 }
 
 function showFavorites() {
