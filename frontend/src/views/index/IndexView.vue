@@ -111,13 +111,13 @@ function createShortUrl() {
 }
 
 function isAuthorized() {
-  const match = document.cookie.match(/USER_TOKEN=([^;]+)/);
+  const match = document.cookie.match(/OAUTH_SESSION_ID=([^;]+)/);
   return match !== null;
 }
 
 function openAuthModal() {
     showQrLogin().then(() => {
-        user.value.authorized = true;
+        refresh()
     })
 }
 
@@ -139,7 +139,7 @@ async function logout() {
   const confirmed = await window.confirm("Вы уверены, что хотите выйти из профиля?");
     if (!confirmed) return;
 
-  Cookies.remove('USER_TOKEN', { path: '/' });
+  Cookies.remove('OAUTH_SESSION_ID', { path: '/' });
   refresh();
 }
 

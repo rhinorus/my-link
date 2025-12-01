@@ -15,9 +15,6 @@ spring:
         period: 7d
 
 spring.application.name: mylink
-application.externalUrl: ${EXTERNAL_URL:http://localhost:8080/}
-application.centralizedAuthApplicationUrl: ${CENTRALIZED_AUTH_APP_URL:http://localhost:8090}
-application.centralizedAuthBotUrl: ${CENTRALIZED_AUTH_BOT_URL:https://t.me/oauth0_bot}
 
 # https reverse proxy support
 server:
@@ -26,5 +23,7 @@ server:
     enabled: true
 
 oauth0:
-  service-base-url: http://95.86.242.119:8080
+  service-base-url: ${SERVICE_BASE_URL}
   oauth-base-url: https://oauth0.site
+  description: Легко запомнить. Легко поделиться.
+  service-name: Моя-ссылка.рф
