@@ -1,44 +1,38 @@
 package ru.mylink.mylink.services;
 
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.mylink.mylink.model.entity.AnonymousSession;
+import ru.mylink.mylink.model.entity.Link;
+import ru.mylink.mylink.model.entity.User;
+import ru.mylink.mylink.repositories.LinkRepository;
+
 import java.util.Optional;
 import java.util.Set;
-
-import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-import ru.mylink.mylink.model.entity.Link;
-import ru.mylink.mylink.model.entity.Session;
-import ru.mylink.mylink.repositories.LinkRepository;
 
 @Service
 @RequiredArgsConstructor
 public class LinkService {
 
-    private final LinkRepository linkRepository; 
-    private final UserService userService;
-    
+    private final LinkRepository linkRepository;
+
     public Optional<Link> find(String shortUrl) {
         return linkRepository.findFirstByShortUrl(shortUrl.toLowerCase());
     }
 
-    public Iterable<Link> findAll(){
-        return linkRepository.findAll();
+    public Set<Link> findAllBySession(AnonymousSession anonymousSession) {
+        return linkRepository.findAllByAnonymousSessionToken(anonymousSession.getToken());
     }
 
-    public Set<Link> findAllBySession(Session session){
-        return linkRepository.findAllBySessionToken(session.getToken());
-    }
-
-    public Set<Link> findAllByUserTelegramId(Long userTelegramId){
+    public Set<Link> findAllByUserTelegramId(Long userTelegramId) {
         return linkRepository.findAllByUserTelegramId(userTelegramId);
     }
 
-    public Link put(Link link){
+    public Link put(Link link) {
         return linkRepository.save(link);
     }
 
-    public Boolean deleteIfExists(String shortUrl){
+    public Boolean deleteIfExists(String shortUrl) {
         var link = find(shortUrl);
 
         if (link.isEmpty())
@@ -48,35 +42,26 @@ public class LinkService {
         return true;
     }
 
-    public Boolean isAuthorized(Link link, Session session){
-
+    public Boolean isAuthorized(Link link, Optional<AnonymousSession> anonymousSession, Optional<User> user) {
         // Либо ссылка создана в рамках текущей сессии
-        if (Objects.nonNull(link.getSession()))
-            if (link.getSession().getToken().equals(session.getToken()))
+        if (link.getAnonymousSession() != null && anonymousSession.isPresent()) {
+            if (link.getAnonymousSession().getToken().equals(anonymousSession.get().getToken())) {
                 return true;
-
+            }
+        }
         // Либо ссылка принадлежит текущему пользователю
-        if (Objects.nonNull(session.getUser()))
-            if (Objects.nonNull(link.getUser()))
-                return link.getUser().getTelegramId().equals(session.getUser().getTelegramId());
+        if (link.getUser() != null && user.isPresent()) {
+            return link.getUser().getTelegramId().equals(user.get().getTelegramId());
+        }
 
         return false;
-    }
-
-    public void transferLinksToUser(String anonymousSessionToken, Long userTelegramId) {
-        var user = userService.getOrCreate(userTelegramId);
-        var links = linkRepository.findAllBySessionToken(anonymousSessionToken);
-
-        links.forEach(link -> link.setUser(user));
-        linkRepository.saveAll(links);
     }
 
     public Long count() {
         return linkRepository.count();
     }
 
-    public Long totalClicks(){
+    public Long totalClicks() {
         return linkRepository.totalClicks();
     }
-
 }

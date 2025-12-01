@@ -12,20 +12,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "anonymous_sessions")
 @Getter @Setter
 @NoArgsConstructor
-public class Session {
+public class AnonymousSession {
 
     @Id
     private String token;
 
-    @OneToOne
-    private User user;
-
-    @OneToMany(mappedBy="session")
+    @OneToMany(mappedBy="anonymousSession")
     private Set<Link> links;
-
-    @OneToOne(mappedBy="session")
-    private SessionCentralizedAuthRequest request;
 }

@@ -5,10 +5,10 @@ import type { ILink } from '@/components/ShortLink.vue';
 import { computed, ref, watch, shallowRef } from 'vue';
 import axios from 'axios';
 import showToast, { ToastType } from '@/mixins/toastMixin';
-import QRCodeStyling from 'qr-code-styling';
 import moment from 'moment';
 import type { IStatistics } from './interfaces/Statistics';
 import Cookies from 'js-cookie'
+import {showQrLogin} from "oauth0-js-lib";
 
 const MAX_NUMBER_OF_LINKS = 99;
 
@@ -20,8 +20,7 @@ const link = ref({
 });
 
 const user = ref({
-  authorized: false,
-  authUrl: ''
+  authorized: false
 });
 
 const applicationStats = ref<IStatistics>();
@@ -30,7 +29,6 @@ const applicationStats = ref<IStatistics>();
 const showFavoritesOnly = ref(false);
 
 const links = ref<ILink[]>([]);
-const showAuthDialog = shallowRef(false);
 const showStatsDialog = shallowRef(false);
 const showUserAgreementDialog = shallowRef(false);
 
@@ -53,7 +51,7 @@ watch(
       link.value.isAlreadyUsed = false;
       return;
     }
-    
+
     link.value.isBelongsToUser = false;
 
     axios.get(`/api/links/by-short-url/${shortUrl}`).then(
@@ -69,8 +67,6 @@ async function refresh() {
       links.value.sort((a,b) => moment(b.lastModified).diff(moment(a.lastModified)));
 
       user.value.authorized = isAuthorized();
-      if (!user.value.authorized)
-        loadAuthUrl();
     }
   )
 
@@ -115,68 +111,14 @@ function createShortUrl() {
 }
 
 function isAuthorized() {
-  const match = document.cookie.match(/USER_TOKEN=([^;]+)/);
+  const match = document.cookie.match(/OAUTH_SESSION_ID=([^;]+)/);
   return match !== null;
 }
 
-function loadAuthUrl() {
-  axios.get('/api/centralized-auth/url').then(
-    (response) => {
-      user.value.authUrl = response.data;
-      checkAuth();
-    }
-  )
-}
-
-function checkAuth() {
-  if (user.value.authorized)
-    return;
-
-  setTimeout(() => {
-    axios.get("/api/centralized-auth/auth").then(
-      (response) => {
-        if (response.status == 200){
-          user.value.authorized = true;
-          showAuthDialog.value = false;
-          refresh();
-        }
-      }
-    )
-    checkAuth();
-  }, 3000);
-}
-
-function openAuthModal() {  
-  showAuthDialog.value = true;
-}
-
-function openAuthLink() {
-  window.open(user.value.authUrl, '_blank');
-}
-
-function appendQRCode () {
-  const qrCode = new QRCodeStyling({
-      width: 250,
-      height: 250,
-      margin: 0,
-      type: "svg",
-      data: user.value.authUrl,
-      image: "/src/assets/images/telegram.webp",
-      dotsOptions: {
-          color: "#24A1DE",
-          type: "rounded"
-      },
-      imageOptions: {
-          crossOrigin: "anonymous",
-          margin: 10,
-          imageSize: .4
-      }
-  });
-
-  var qrCodeElement = document.getElementById("qrcode");
-  if (qrCodeElement !== null)
-    qrCode.append(qrCodeElement);
-
+function openAuthModal() {
+    showQrLogin().then(() => {
+        refresh()
+    })
 }
 
 function showFavorites() {
@@ -197,7 +139,7 @@ async function logout() {
   const confirmed = await window.confirm("Вы уверены, что хотите выйти из профиля?");
     if (!confirmed) return;
 
-  Cookies.remove('USER_TOKEN', { path: '/' });
+  Cookies.remove('OAUTH_SESSION_ID', { path: '/' });
   refresh();
 }
 
@@ -252,7 +194,7 @@ loadData();
     <div class="block column gap-1">
 
       <!-- Карточка авторизации -->
-      <div class="scenarios card" v-if="!user.authorized && user.authUrl" @click="openAuthModal">
+      <div class="scenarios card" v-if="!user.authorized" @click="openAuthModal">
         <!-- Заголовок карточки -->
         <div class="w-100 row flex-start gap-1">
           <div class="center">
@@ -309,9 +251,9 @@ loadData();
 
           </div>
 
-          <tg-button @click="createShortUrl" class="w-100" 
-            :alert="!isFormValid" 
-            :disabled="!isFormComplete" 
+          <tg-button @click="createShortUrl" class="w-100"
+            :alert="!isFormValid"
+            :disabled="!isFormComplete"
             :name="creationButtonText">
           </tg-button>
         </div>
@@ -330,12 +272,12 @@ loadData();
         <div class="flex column gap-1" v-if="filteredLinks.length > 0">
 
           <!-- Ссылка -->
-          <short-link v-for="link in filteredLinks" 
-            :url="link.url" 
+          <short-link v-for="link in filteredLinks"
+            :url="link.url"
             :is-favorite="link.isFavorite"
-            :short-url="link.shortUrl" 
+            :short-url="link.shortUrl"
             :count="link.count"
-            :last-modified="link.lastModified" 
+            :last-modified="link.lastModified"
             @update="refresh"
             @toggle-is-favorite="toggleIsFavorite">
           </short-link>
@@ -355,26 +297,6 @@ loadData();
       <span @click="showStatsDialog = true" class="hint">Статистика</span>
     </div>
   </div>
-
-
-  <!-- Модальное окно авторизации -->
-  <v-dialog v-model="showAuthDialog" width="auto" @vue:updated="appendQRCode">
-    <v-card
-        title="Отсканируйте QR-код"
-        style="padding: 20px;"
-      >
-      <div class="flex column center gap-1" style="margin-bottom: 20px;">
-        <div id="qrcode"></div>
-
-        <span>ИЛИ</span>
-
-        <tg-button @click="openAuthLink" style="height: 30px; margin: 10px"
-          :name="'Войдите с текущего устройства'">
-        </tg-button>
-      </div>
-        
-      </v-card>
-  </v-dialog>
 
   <!-- Модальное окно со статистикой -->
   <v-dialog v-model="showStatsDialog" width="auto">

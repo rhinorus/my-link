@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ru.mylink.mylink.model.entity.Session;
+import ru.mylink.mylink.model.entity.AnonymousSession;
 
-public interface SessionRepository extends JpaRepository<Session, String> {
-    public Optional<Session> findByToken(String token);
+public interface SessionRepository extends JpaRepository<AnonymousSession, String> {
+    public Optional<AnonymousSession> findByToken(String token);
 }
